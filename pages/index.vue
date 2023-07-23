@@ -18,16 +18,16 @@
       </div>
 
     <div id= "menu">
-      <button @click="click(1)">Game</button>
-      <button @click="click(2)">LeaderBoard</button>
-      <button @click="click(3)">Quit</button>
+      <h1 @click="click(1)"> Start Game</h1>
+      <h1 @click="click(2)">LeaderBoard</h1>
+      <h1 @click="click(3)">Quit</h1>
     </div> 
     </div>
 </template>
 
 <script setup >
 
-
+  import json from './json/data.json'
   const {
     data: spaceField,
     refresh: updateSpaceField
@@ -56,14 +56,21 @@
     window.setInterval(updateSpaceField, 100);
   })
 
+
+
   function click(i){
       alert("option " + i);
       switch(i){
         case 1:
+          alert("start !")
           var menu = document.getElementById("menu");
           menu.style.visibility='hidden';
           break;
         case 2:
+          alert("1º: " + json[0].name+", score: "+json[0].score + ";\n" +
+                "2º: " + json[1].name+", score: "+json[1].score + ";\n" +
+                "3º: " + json[2].name+", score: "+json[2].score + ";\n"
+            )
           break;
         case 3:
           alert("closing Game");
@@ -124,7 +131,7 @@
   background-color: white;
 }
 
-button:hover{
+h1:hover{
   background-color: yellow;
 }
 

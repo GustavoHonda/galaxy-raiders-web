@@ -1,3 +1,5 @@
+
+
 <template>
   <div id="canvas">
     <div id="deep-space" />
@@ -15,65 +17,38 @@
       <SpaceObject class="explosion" :data="explosion" resolution="2"
                   :key="explosion.center"
                   v-for="explosion in spaceField.explosions" />
-      </div>
-
-    <div id= "menu">
-      <button @click="click(1)">Game</button>
-      <button @click="click(2)">LeaderBoard</button>
-      <button @click="click(3)">Quit</button>
-    </div> 
     </div>
+  </div>
 </template>
 
-<script setup >
+<script setup>
+const {
+  data: spaceField,
+  refresh: updateSpaceField
+} = await $get("/space-field");
 
+onMounted(() => {
+  window.addEventListener("keydown", async (event) => {
+    const keyToCommand = {
+      "ArrowUp": "MOVE_SHIP_UP",
+      "ArrowDown": "MOVE_SHIP_DOWN",
+      "ArrowRight": "MOVE_SHIP_RIGHT",
+      "ArrowLeft": "MOVE_SHIP_LEFT",
+      "Space": "LAUNCH_MISSILE",
+      "Escape": "PAUSE_GAME",
+    };
 
-  const {
-    data: spaceField,
-    refresh: updateSpaceField
-  } = await $get("/space-field");
+    const command = keyToCommand[event.code];
 
-  onMounted(() => {
-    window.addEventListener("keydown", async (event) => {
-      const keyToCommand = {
-        "ArrowUp": "MOVE_SHIP_UP",
-        "ArrowDown": "MOVE_SHIP_DOWN",
-        "ArrowRight": "MOVE_SHIP_RIGHT",
-        "ArrowLeft": "MOVE_SHIP_LEFT",
-        "Space": "LAUNCH_MISSILE",
-        "Escape": "PAUSE_GAME",
-      };
+    // Ignore if invalid key was pressed
+    if (command === undefined) return;
 
-      const command = keyToCommand[event.code];
+    console.log(`Triggering command: ${command}`);
+    await $post("/ship/commands", { command })
+  });
 
-      // Ignore if invalid key was pressed
-      if (command === undefined) return;
-
-      console.log(`Triggering command: ${command}`);
-      await $post("/ship/commands", { command })
-    });
-
-    window.setInterval(updateSpaceField, 100);
-  })
-
-  function click(i){
-      alert("option " + i);
-      switch(i){
-        case 1:
-          var menu = document.getElementById("menu");
-          menu.style.visibility='hidden';
-          break;
-        case 2:
-          break;
-        case 3:
-          alert("closing Game");
-          // Chrome error: Scripts may close only the windows that were opened by them.
-          // Firefox config: dom.allow_scripts_to_close_windows =true
-         window.close();
-         break;     
-      }
-  }
-
+  window.setInterval(updateSpaceField, 100);
+})
 </script>
 
 <style>
@@ -109,25 +84,13 @@
   height: calc(100% - 4rem);
   width: calc(100% - 4rem);
 
-  /*background-image: url("~/assets/space.png");*/
+  background-image: url("~/assets/space.png");
   background-origin: content-box;
   animation: slide 3s linear infinite;
 
   position: absolute;
   z-index: 0;
 }
-
-#menu {
-  height: 80px;
-  width:  160px;
-  position: absolute;
-  background-color: white;
-}
-
-button:hover{
-  background-color: yellow;
-}
-
 
 #space-field {
   height: calc(100% - 4rem);
